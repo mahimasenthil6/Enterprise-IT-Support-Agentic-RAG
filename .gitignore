@@ -1,1 +1,57 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[codz]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Environments and API secrets
 .env
+.envrc
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python testing and cache
+.pytest_cache/
+.coverage
+.coverage.*
+.cache/
+.tox/
+.nox/
+
+# IDE
+.idea/
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# Temporary files
+tempCodeRunnerFile.py
