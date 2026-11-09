@@ -10,4 +10,11 @@ langchain-tavily
 pinecone
 sentence-transformers
 beautifulsoup4
-python-dotenv 
+pypdf
+python-docx
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+pydantic-settings
+python-dotenv
