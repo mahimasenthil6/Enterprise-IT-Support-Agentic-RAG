@@ -51,6 +51,7 @@ def get_embeddings():
     if _embeddings is None:
         _embeddings = HuggingFaceEmbeddings(
             model_name=settings.embedding_model,
+            model_kwargs={"local_files_only": True},
             encode_kwargs={"normalize_embeddings": True},
         )
 
