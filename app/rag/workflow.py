@@ -1,6 +1,6 @@
 
 import logging
-from typing import Literal, List
+from typing import Literal
 
 from langchain_groq import ChatGroq
 from langchain_tavily import TavilySearch
@@ -74,7 +74,11 @@ def add_trace(state: AgentState, message: str):
 
 def route_question(state: AgentState):
 
-    router = llm().with_structured_output(RouteDecision)
+    router = llm().with_structured_output(
+        RouteDecision,
+        method="json_schema",
+        strict=True,
+    )
 
     decision = router.invoke(f"""
 You route messages for an enterprise IT support assistant.
@@ -95,13 +99,13 @@ Return a structured response with route equal to kb or direct.
         "source_used": decision.route,
         "trace": add_trace(
             state,
-            f"Router → {decision.route.upper()}"
+            f"Router → {decision.route.upper()}",
         ),
     }
 
 
 def route_after_router(
-    state: AgentState
+    state: AgentState,
 ) -> Literal["retrieve_kb", "direct_answer"]:
 
     return (
@@ -123,7 +127,7 @@ def retrieve_kb(state: AgentState):
         "kb_docs": docs,
         "trace": add_trace(
             state,
-            f"Private KB retrieval → {len(docs)} chunks"
+            f"Private KB retrieval → {len(docs)} chunks",
         ),
     }
 
@@ -134,7 +138,11 @@ def retrieve_kb(state: AgentState):
 
 def grade_kb(state: AgentState):
 
-    grader = llm().with_structured_output(EvidenceGrade)
+    grader = llm().with_structured_output(
+        EvidenceGrade,
+        method="json_schema",
+        strict=True,
+    )
 
     context = "\n\n".join(
         f"Source: {d.metadata.get('source', 'unknown')}\n"
@@ -160,13 +168,13 @@ Otherwise return weak.
         "kb_grade": grade.grade,
         "trace": add_trace(
             state,
-            f"KB evidence grade → {grade.grade.upper()}"
+            f"KB evidence grade → {grade.grade.upper()}",
         ),
     }
 
 
 def after_kb(
-    state: AgentState
+    state: AgentState,
 ) -> Literal["generate_from_kb", "search_web"]:
 
     return (
@@ -223,7 +231,7 @@ def search_web(state: AgentState):
         "source_used": "web",
         "trace": add_trace(
             state,
-            "Web fallback → Tavily search"
+            "Web fallback → Tavily search",
         ),
     }
 
@@ -234,7 +242,11 @@ def search_web(state: AgentState):
 
 def grade_web(state: AgentState):
 
-    grader = llm().with_structured_output(EvidenceGrade)
+    grader = llm().with_structured_output(
+        EvidenceGrade,
+        method="json_schema",
+        strict=True,
+    )
 
     grade = grader.invoke(f"""
 Question: {state['question']}
@@ -250,13 +262,13 @@ Otherwise return weak.
         "web_grade": grade.grade,
         "trace": add_trace(
             state,
-            f"Web evidence grade → {grade.grade.upper()}"
+            f"Web evidence grade → {grade.grade.upper()}",
         ),
     }
 
 
 def after_web(
-    state: AgentState
+    state: AgentState,
 ) -> Literal["generate_from_web", "rewrite_query", "insufficient"]:
 
     if state["web_grade"] == "good":
@@ -291,7 +303,7 @@ Question: {state['question']}
         "retry_count": state["retry_count"] + 1,
         "trace": add_trace(
             state,
-            f"Query rewrite → {rewritten}"
+            f"Query rewrite → {rewritten}",
         ),
     }
 
@@ -347,7 +359,7 @@ Private KB:
         "citations": citations,
         "trace": add_trace(
             state,
-            "Answer generation → PRIVATE KB"
+            "Answer generation → PRIVATE KB",
         ),
     }
 
@@ -380,7 +392,7 @@ Web evidence:
         "source_used": "web_search",
         "trace": add_trace(
             state,
-            "Answer generation → WEB SEARCH"
+            "Answer generation → WEB SEARCH",
         ),
     }
 
@@ -400,7 +412,7 @@ def direct_answer(state: AgentState):
         "source_used": "direct",
         "trace": add_trace(
             state,
-            "Direct response → no retrieval"
+            "Direct response → no retrieval",
         ),
     }
 
@@ -421,7 +433,7 @@ def insufficient(state: AgentState):
         "source_used": "insufficient_evidence",
         "trace": add_trace(
             state,
-            "Stopped → insufficient reliable evidence"
+            "Stopped → insufficient reliable evidence",
         ),
     }
 
